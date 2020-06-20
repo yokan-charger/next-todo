@@ -7,8 +7,8 @@ export default function Home({tasks}) {
   const [todos, setTodos] = useState(tasks);
   const [tmpTodo, setTmpTodo] = useState("");
   const addTodo = () => {
-    setTodos([...todos, tmpTodo]);
-    setTmpTodo("");
+    setTodos([...todos, {title: tmpTodo}])
+    setTmpTodo("")
     addTask(tmpTodo)
   }
 
