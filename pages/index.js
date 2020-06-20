@@ -6,7 +6,6 @@ import { useState } from 'react';
 export default function Home({tasks}) {
   const [todos, setTodos] = useState(tasks);
   const [tmpTodo, setTmpTodo] = useState("");
-
   const addTodo = () => {
     setTodos([...todos, tmpTodo]);
     setTmpTodo("");
@@ -41,7 +40,7 @@ export default function Home({tasks}) {
           {todos.map((todo, index) => {
             return (
               <li key={index}>
-                {todo}
+                {todo.title}
                 <button onClick={() => deleteTodo(index)}>x</button>
               </li>
             )
