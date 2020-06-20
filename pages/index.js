@@ -1,20 +1,22 @@
 import Head from 'next/head'
 import Task from '../components/task'
-import {getAllTasks, addTask} from '../lib/tasks'
+import {getAllTasks, addTask, deleteTask} from '../lib/tasks'
 import { useState } from 'react';
 
 export default function Home({tasks}) {
-  const [todos, setTodos] = useState(tasks);
-  const [tmpTodo, setTmpTodo] = useState("");
-  const addTodo = () => {
-    setTodos([...todos, {title: tmpTodo}])
+  const [todos, setTodos] = useState(tasks)
+  const [tmpTodo, setTmpTodo] = useState("")
+  const addTodo = async () => {
+    let task = await addTask(tmpTodo)
+
+    setTodos([...todos, task])
     setTmpTodo("")
-    addTask(tmpTodo)
   }
 
-  const deleteTodo = index => {
-    const newTodos = todos.filter((todo, todoIndex) => {
-      return index !== todoIndex
+  const deleteTodo = deleteTodo => {
+    deleteTask(deleteTodo)
+    const newTodos = todos.filter((todo, i) => {
+      return deleteTodo.id !== todo.id
     })
     setTodos(newTodos)
   }
@@ -41,7 +43,7 @@ export default function Home({tasks}) {
             return (
               <li key={index}>
                 {todo.title}
-                <button onClick={() => deleteTodo(index)}>x</button>
+                <button onClick={() => deleteTodo(todo)}>x</button>
               </li>
             )
           })}
