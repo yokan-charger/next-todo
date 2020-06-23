@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import Task from '../components/task'
-import {getAllTasks, addTask, deleteTask} from '../lib/tasks'
+import {getAllTasks, addTask, deleteTask, putStatus, putTitle} from '../lib/tasks'
 import { useState } from 'react';
 
 export default function Home({tasks}) {
@@ -19,6 +19,18 @@ export default function Home({tasks}) {
       return deleteTodo.id !== todo.id
     })
     setTodos(newTodos)
+  }
+
+  const updateStatus = async (todo, index) => {
+    await putStatus(todo)
+    todos[index].completed = !todo.completed
+    setTodos(todos)
+  }
+
+  const updateTitle = async (todo, index, title) => {
+    await putTitle(todo, title)
+    todos[index].title = title
+    setTodos(todos)
   }
 
   return (
@@ -42,7 +54,8 @@ export default function Home({tasks}) {
           {todos.map((todo, index) => {
             return (
               <li key={index}>
-                {todo.title}
+                <input type='checkbox' defaultChecked={todo.completed} onClick={() => updateStatus(todo, index)} />
+                <input defaultValue={todo.title} onBlur={(e) => e.target.value != todo.title && updateTitle(todo, index, e.target.value)}/>
                 <button onClick={() => deleteTodo(todo)}>x</button>
               </li>
             )
