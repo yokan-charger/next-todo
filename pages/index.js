@@ -15,10 +15,10 @@ export default function Home({tasks}) {
     setTmpTodo("")
   }
 
-  const deleteTodo = deleteTodo => {
+  const deleteTodo = delTodo => {
     deleteTask(deleteTodo)
     const newTodos = todos.filter((todo, i) => {
-      return deleteTodo.id !== todo.id
+      return delTodo.id !== todo.id
     })
     setTodos(newTodos)
   }
@@ -72,8 +72,8 @@ export default function Home({tasks}) {
           {todos.filter(todo => todo.completed).map((todo, index) => {
             return (
               <List.Item key={index} style={{display: "flex"}}>
-                <Checkbox defaultChecked={todo.completed} onClick={() => updateStatus(todo, index)} style={{marginRight: "5px"}} />
-                <Input defaultValue={todo.title} onBlur={(e) => e.target.value != todo.title && updateTitle(todo, index, e.target.value)}/>
+                <Checkbox checked={todo.completed} onClick={() => updateStatus(todo, index)} style={{marginRight: "5px"}} />
+                <Input value={todo.title} onBlur={(e) => e.target.value != todo.title && isEmptyField(e.target.value) && updateTitle(todo, index, e.target.value)}/>
                 <Button type="primary" onClick={() => deleteTodo(todo)} danger><DeleteOutlined /></Button>
               </List.Item>
             )
