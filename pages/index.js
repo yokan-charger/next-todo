@@ -2,6 +2,8 @@ import Head from 'next/head'
 import Task from '../components/task'
 import {getAllTasks, addTask, deleteTask, putStatus, putTitle} from '../lib/tasks'
 import { useState } from 'react';
+import { Button, Input, Checkbox, Row, Col, List } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
 
 export default function Home({tasks}) {
   const [todos, setTodos] = useState(tasks)
@@ -41,37 +43,43 @@ export default function Home({tasks}) {
       </Head>
 
       <main>
-        <div>
-          <input
-            type='text'
-            name='todo'
-            onChange={e => setTmpTodo(e.target.value)}
-            value={tmpTodo}
-          />
-          <button onClick={addTodo}> Add </button>
-        </div>
-        <ul>
+        <Row>
+          <Col span={16}>
+            <Input
+              type='text'
+              name='todo'
+              onChange={e => setTmpTodo(e.target.value)}
+              value={tmpTodo}
+            />
+          </Col>
+          <Col span={8}>
+            <Button onClick={addTodo} type="primary"> Add </Button>
+          </Col>
+        </Row>
+        <List
+          split={false}
+        >
           {todos.filter(todo => !todo.completed).map((todo, index) => {
             return (
-              <li key={index}>
-                <input type='checkbox' defaultChecked={todo.completed} onClick={() => updateStatus(todo, index)} />
-                <input defaultValue={todo.title} onBlur={(e) => e.target.value != todo.title && updateTitle(todo, index, e.target.value)}/>
-                <button onClick={() => deleteTodo(todo)}>x</button>
-              </li>
+              <List.Item key={index} style={{display: "flex"}}>
+                <Checkbox defaultChecked={todo.completed} onClick={() => updateStatus(todo, index)} style={{marginRight: "5px"}} />
+                <Input defaultValue={todo.title} onBlur={(e) => e.target.value != todo.title && updateTitle(todo, index, e.target.value)}/>
+                <Button type="primary" onClick={() => deleteTodo(todo)} danger><DeleteOutlined /></Button>
+              </List.Item>
             )
           })}
-          <div>------------------------------------------------------------------</div>
+          <div>-----------------------------------------------------</div>
           {todos.filter(todo => todo.completed).map((todo, index) => {
             return (
-              <li key={index}>
-                <input type='checkbox' defaultChecked={todo.completed} onClick={() => updateStatus(todo, index)} />
-                <input defaultValue={todo.title} onBlur={(e) => e.target.value != todo.title && updateTitle(todo, index, e.target.value)}/>
-                <button onClick={() => deleteTodo(todo)}>x</button>
-              </li>
+              <List.Item key={index} style={{display: "flex"}}>
+                <Checkbox defaultChecked={todo.completed} onClick={() => updateStatus(todo, index)} style={{marginRight: "5px"}} />
+                <Input defaultValue={todo.title} onBlur={(e) => e.target.value != todo.title && updateTitle(todo, index, e.target.value)}/>
+                <Button type="primary" onClick={() => deleteTodo(todo)} danger><DeleteOutlined /></Button>
+              </List.Item>
             )
           })}
 
-        </ul>
+        </List>
         {/* <Task test={tasks} onClick={() => {addTask({completed: false, taskName: 'hoge'})}} /> */}
       </main>
 
