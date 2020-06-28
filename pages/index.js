@@ -51,7 +51,7 @@ export default function Home({tasks}) {
           <button onClick={addTodo}> Add </button>
         </div>
         <ul>
-          {todos.map((todo, index) => {
+          {todos.filter(todo => !todo.completed).map((todo, index) => {
             return (
               <li key={index}>
                 <input type='checkbox' defaultChecked={todo.completed} onClick={() => updateStatus(todo, index)} />
@@ -60,6 +60,17 @@ export default function Home({tasks}) {
               </li>
             )
           })}
+          <div>------------------------------------------------------------------</div>
+          {todos.filter(todo => todo.completed).map((todo, index) => {
+            return (
+              <li key={index}>
+                <input type='checkbox' defaultChecked={todo.completed} onClick={() => updateStatus(todo, index)} />
+                <input defaultValue={todo.title} onBlur={(e) => e.target.value != todo.title && updateTitle(todo, index, e.target.value)}/>
+                <button onClick={() => deleteTodo(todo)}>x</button>
+              </li>
+            )
+          })}
+
         </ul>
         {/* <Task test={tasks} onClick={() => {addTask({completed: false, taskName: 'hoge'})}} /> */}
       </main>
