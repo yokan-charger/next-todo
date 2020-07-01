@@ -2,6 +2,8 @@ import Head from 'next/head'
 import Task from '../components/task'
 import {getAllTasks, addTask, deleteTask, putStatus, putTitle} from '../lib/tasks'
 import { useState } from 'react';
+import { Button, TextField, Checkbox, IconButton } from '@material-ui/core';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 export default function Home({tasks}) {
   const [todos, setTodos] = useState(tasks)
@@ -14,17 +16,23 @@ export default function Home({tasks}) {
   }
 
   const deleteTodo = delTodo => {
-    deleteTask(deleteTodo)
-    const newTodos = todos.filter((todo, i) => {
+    deleteTask(delTodo)
+    let newTodos = todos.filter((todo, i) => {
       return delTodo.id !== todo.id
     })
     setTodos(newTodos)
   }
 
-  const updateStatus = async (todo, index) => {
+  const updateStatus = async (todo) => {
     await putStatus(todo)
-    todos[index].completed = !todo.completed
-    setTodos(todos)
+    let tmpTodos = []
+    todos.forEach((t) => {
+      if ( t.id == todo.id ) {
+        t.completed = !todo.completed
+      }
+      tmpTodos.push(t)
+    })
+    setTodos(tmpTodos)
   }
 
   const updateTitle = async (todo, index, title) => {
@@ -42,21 +50,29 @@ export default function Home({tasks}) {
 
       <main>
         <div>
-          <input
-            type='text'
-            name='todo'
+          <TextField
+            variant='outlined'
+            error={false}
+            label="Todoタイトル"
+            helperText={''}
             onChange={e => setTmpTodo(e.target.value)}
             value={tmpTodo}
           />
-          <button onClick={addTodo}> Add </button>
+          <Button variant="contained" size="large" color="primary" onClick={addTodo}> Add </Button>
         </div>
         <ul>
           {todos.filter(todo => !todo.completed).map((todo, index) => {
             return (
               <li key={index}>
-                <input type='checkbox' defaultChecked={todo.completed} onClick={() => updateStatus(todo, index)} />
-                <input defaultValue={todo.title} onBlur={(e) => e.target.value != todo.title && updateTitle(todo, index, e.target.value)}/>
-                <button onClick={() => deleteTodo(todo)}>x</button>
+                <Checkbox checked={todo.completed} onClick={() => updateStatus(todo)} inputProps={{ 'aria-label': 'primary checkbox' }}/>
+                <TextField
+                  variant='outlined'
+                  error={false}
+                  helperText={''}
+                  value={todo.title}
+                  onBlur={(e) => e.target.value != todo.title && updateTitle(todo, index, e.target.value)}
+                />
+                <IconButton aria-label="delete" onClick={() => deleteTodo(todo)}><DeleteIcon /></IconButton>
               </li>
             )
           })}
@@ -64,9 +80,15 @@ export default function Home({tasks}) {
           {todos.filter(todo => todo.completed).map((todo, index) => {
             return (
               <li key={index}>
-                <input type='checkbox' checked={todo.completed} onClick={() => updateStatus(todo, index)} />
-                <input value={todo.title} onBlur={(e) => e.target.value != todo.title && updateTitle(todo, index, e.target.value)}/>
-                <button onClick={() => deleteTodo(todo)}>x</button>
+                <Checkbox checked={todo.completed} onClick={() => updateStatus(todo)} inputProps={{ 'aria-label': 'primary checkbox' }}/>
+                <TextField
+                  variant='outlined'
+                  error={false}
+                  helperText={''}
+                  value={todo.title}
+                  onBlur={(e) => e.target.value != todo.title && updateTitle(todo, index, e.target.value)}
+                />
+                <IconButton aria-label="delete" onClick={() => deleteTodo(todo)}><DeleteIcon /></IconButton>
               </li>
             )
           })}
