@@ -8,8 +8,16 @@ import DeleteIcon from '@material-ui/icons/Delete';
 export default function Home({tasks}) {
   const [todos, setTodos] = useState(tasks)
   const [tmpTodo, setTmpTodo] = useState("")
+  const [tmpTodoError, setTmpTodoError] = useState(false)
+
   const addTodo = async () => {
+    if (!tmpTodo) {
+      setTmpTodoError(true)
+      return
+    }
+
     let task = await addTask(tmpTodo)
+    setTmpTodoError(false)
 
     setTodos([...todos, task])
     setTmpTodo("")
@@ -35,10 +43,21 @@ export default function Home({tasks}) {
     setTodos(tmpTodos)
   }
 
-  const updateTitle = async (todo, index, title) => {
+  const updateTitle = async (todo, title) => {
+    if (!title || title != todo.title) return
+
     await putTitle(todo, title)
-    todos[index].title = title
-    setTodos(todos)
+  }
+
+  const setTitle = (todo, title) => {
+    let tmpTodos = []
+    todos.forEach((t) => {
+      if ( t.id == todo.id ) {
+        t.title = title
+      }
+      tmpTodos.push(t)
+    })
+    setTodos(tmpTodos)
   }
 
   return (
@@ -52,9 +71,9 @@ export default function Home({tasks}) {
         <div>
           <TextField
             variant='outlined'
-            error={false}
+            error={tmpTodoError}
             label="Todoタイトル"
-            helperText={''}
+            helperText={tmpTodoError && 'Todoタイトルが必須です'}
             onChange={e => setTmpTodo(e.target.value)}
             value={tmpTodo}
           />
@@ -67,8 +86,8 @@ export default function Home({tasks}) {
                 <Checkbox checked={todo.completed} onClick={() => updateStatus(todo)} inputProps={{ 'aria-label': 'primary checkbox' }}/>
                 <TextField
                   variant='outlined'
-                  error={false}
-                  helperText={''}
+                  error={!todo.title}
+                  helperText={!todo.title && 'Todoタイトルが必須です'}
                   value={todo.title}
                   onBlur={(e) => e.target.value != todo.title && updateTitle(todo, index, e.target.value)}
                 />
@@ -83,10 +102,11 @@ export default function Home({tasks}) {
                 <Checkbox checked={todo.completed} onClick={() => updateStatus(todo)} inputProps={{ 'aria-label': 'primary checkbox' }}/>
                 <TextField
                   variant='outlined'
-                  error={false}
-                  helperText={''}
+                  error={!todo.title}
+                  helperText={!todo.title && 'Todoタイトルが必須です'}
                   value={todo.title}
-                  onBlur={(e) => e.target.value != todo.title && updateTitle(todo, index, e.target.value)}
+                  onChange={(e) => setTitle(todo, e.target.value)}
+                  onBlur={(e) => updateTitle(todo, e.target.value)}
                 />
                 <IconButton aria-label="delete" onClick={() => deleteTodo(todo)}><DeleteIcon /></IconButton>
               </li>
