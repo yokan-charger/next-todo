@@ -3,12 +3,14 @@ import Task from '../components/task'
 import {getAllTasks, addTask, deleteTask, putStatus, putTitle} from '../lib/tasks'
 import { useState } from 'react';
 import { Button, TextField, Checkbox, IconButton } from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
 import DeleteIcon from '@material-ui/icons/Delete';
 
 export default function Home({tasks}) {
   const [todos, setTodos] = useState(tasks)
   const [tmpTodo, setTmpTodo] = useState("")
   const [tmpTodoError, setTmpTodoError] = useState(false)
+  const [error, setError] = useState(tasks === null)
 
   const addTodo = async () => {
     if (!tmpTodo) {
@@ -17,14 +19,26 @@ export default function Home({tasks}) {
     }
 
     let task = await addTask(tmpTodo)
+
+   if(!task) {
+     setError('エラーが発生しました、時間をおいて再度お試しください')
+     return
+   }
+
     setTmpTodoError(false)
 
     setTodos([...todos, task])
     setTmpTodo("")
   }
 
-  const deleteTodo = delTodo => {
-    deleteTask(delTodo)
+  const deleteTodo = async delTodo => {
+    let status = await deleteTask(delTodo)
+    console.log(status)
+    if (status == 500) {
+      setError('エラーが発生しました、時間をおいて再度お試しください')
+      return
+    }
+
     let newTodos = todos.filter((todo, i) => {
       return delTodo.id !== todo.id
     })
@@ -32,7 +46,13 @@ export default function Home({tasks}) {
   }
 
   const updateStatus = async (todo) => {
-    await putStatus(todo)
+    let status = await putStatus(todo)
+
+    if (status == 500) {
+      setError('エラーが発生しました、時間をおいて再度お試しください')
+      return
+    }
+
     let tmpTodos = []
     todos.forEach((t) => {
       if ( t.id == todo.id ) {
@@ -46,7 +66,12 @@ export default function Home({tasks}) {
   const updateTitle = async (todo, title) => {
     if (!title || title != todo.title) return
 
-    await putTitle(todo, title)
+    let status = await putTitle(todo, title)
+
+    if (status == 500) {
+      setError('エラーが発生しました、時間をおいて再度お試しください')
+      return
+    }
   }
 
   const setTitle = (todo, title) => {
@@ -68,6 +93,7 @@ export default function Home({tasks}) {
       </Head>
 
       <main>
+        { error && <Alert severity="error" style={{margin: '20px'}}>{error}</Alert> }
         <div>
           <TextField
             variant='outlined'
@@ -89,7 +115,8 @@ export default function Home({tasks}) {
                   error={!todo.title}
                   helperText={!todo.title && 'Todoタイトルが必須です'}
                   value={todo.title}
-                  onBlur={(e) => e.target.value != todo.title && updateTitle(todo, index, e.target.value)}
+                  onChange={(e) => setTitle(todo, e.target.value)}
+                  onBlur={(e) => updateTitle(todo, e.target.value)}
                 />
                 <IconButton aria-label="delete" onClick={() => deleteTodo(todo)}><DeleteIcon /></IconButton>
               </li>
