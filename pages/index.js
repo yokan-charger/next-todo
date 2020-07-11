@@ -277,7 +277,7 @@ export default function Home({tasks}) {
   )
 }
 
-export async function getStaticProps() {
+export async function getServerSideProps() {
   const tasks = getAllTasks()
   return {
     props: {
