@@ -5,12 +5,14 @@ import { useState } from 'react';
 import { Button, TextField, Checkbox, IconButton } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
 import DeleteIcon from '@material-ui/icons/Delete';
+import { useSession, signin, signout } from 'next-auth/client'
 
 export default function Home({tasks}) {
   const [todos, setTodos] = useState(tasks)
   const [tmpTodo, setTmpTodo] = useState("")
   const [tmpTodoError, setTmpTodoError] = useState(false)
   const [error, setError] = useState(tasks === null)
+  const [ session, loading ] = useSession()
 
   const addTodo = async () => {
     if (!tmpTodo) {
@@ -93,67 +95,64 @@ export default function Home({tasks}) {
       </Head>
 
       <main>
-        { error && <Alert severity="error" style={{margin: '20px'}}>{error}</Alert> }
-        <div>
-          <TextField
-            variant='outlined'
-            error={tmpTodoError}
-            label="Todoタイトル"
-            helperText={tmpTodoError && 'Todoタイトルが必須です'}
-            onChange={e => setTmpTodo(e.target.value)}
-            value={tmpTodo}
-          />
-          <Button variant="contained" size="large" color="primary" onClick={addTodo}> Add </Button>
-        </div>
-        <ul>
-          {todos.filter(todo => !todo.completed).map((todo, index) => {
-            return (
-              <li key={index}>
-                <Checkbox checked={todo.completed} onClick={() => updateStatus(todo)} inputProps={{ 'aria-label': 'primary checkbox' }}/>
-                <TextField
-                  variant='outlined'
-                  error={!todo.title}
-                  helperText={!todo.title && 'Todoタイトルが必須です'}
-                  value={todo.title}
-                  onChange={(e) => setTitle(todo, e.target.value)}
-                  onBlur={(e) => updateTitle(todo, e.target.value)}
-                />
-                <IconButton aria-label="delete" onClick={() => deleteTodo(todo)}><DeleteIcon /></IconButton>
-              </li>
-            )
-          })}
-          <div>------------------------------------------------------------------</div>
-          {todos.filter(todo => todo.completed).map((todo, index) => {
-            return (
-              <li key={index}>
-                <Checkbox checked={todo.completed} onClick={() => updateStatus(todo)} inputProps={{ 'aria-label': 'primary checkbox' }}/>
-                <TextField
-                  variant='outlined'
-                  error={!todo.title}
-                  helperText={!todo.title && 'Todoタイトルが必須です'}
-                  value={todo.title}
-                  onChange={(e) => setTitle(todo, e.target.value)}
-                  onBlur={(e) => updateTitle(todo, e.target.value)}
-                />
-                <IconButton aria-label="delete" onClick={() => deleteTodo(todo)}><DeleteIcon /></IconButton>
-              </li>
-            )
-          })}
+        {!session && <>
+          Not signed in <br/>
+          <button onClick={() => signin('github')}>Sign in with github</button>
+        </>}
+        {session && <>
+          { error && <Alert severity="error" style={{margin: '20px'}}>{error}</Alert> }
+          <div>
+            <TextField
+              variant='outlined'
+              error={tmpTodoError}
+              label="Todoタイトル"
+              helperText={tmpTodoError && 'Todoタイトルが必須です'}
+              onChange={e => setTmpTodo(e.target.value)}
+              value={tmpTodo}
+            />
+            <Button variant="contained" size="large" color="primary" onClick={addTodo}> Add </Button>
+          </div>
+          <ul>
+            {todos.filter(todo => !todo.completed).map((todo, index) => {
+              return (
+                <li key={index}>
+                  <Checkbox checked={todo.completed} onClick={() => updateStatus(todo)} inputProps={{ 'aria-label': 'primary checkbox' }}/>
+                  <TextField
+                    variant='outlined'
+                    error={!todo.title}
+                    helperText={!todo.title && 'Todoタイトルが必須です'}
+                    value={todo.title}
+                    onChange={(e) => setTitle(todo, e.target.value)}
+                    onBlur={(e) => updateTitle(todo, e.target.value)}
+                  />
+                  <IconButton aria-label="delete" onClick={() => deleteTodo(todo)}><DeleteIcon /></IconButton>
+                </li>
+              )
+            })}
+            <div>------------------------------------------------------------------</div>
+            {todos.filter(todo => todo.completed).map((todo, index) => {
+              return (
+                <li key={index}>
+                  <Checkbox checked={todo.completed} onClick={() => updateStatus(todo)} inputProps={{ 'aria-label': 'primary checkbox' }}/>
+                  <TextField
+                    variant='outlined'
+                    error={!todo.title}
+                    helperText={!todo.title && 'Todoタイトルが必須です'}
+                    value={todo.title}
+                    onChange={(e) => setTitle(todo, e.target.value)}
+                    onBlur={(e) => updateTitle(todo, e.target.value)}
+                  />
+                  <IconButton aria-label="delete" onClick={() => deleteTodo(todo)}><DeleteIcon /></IconButton>
+                </li>
+              )
+            })}
 
-        </ul>
+          </ul>
+          Signed in as {session.user.name} <br/>
+          <button onClick={signout}>Sign out</button>
+        </>}
         {/* <Task test={tasks} onClick={() => {addTask({completed: false, taskName: 'hoge'})}} /> */}
       </main>
-
-      <footer>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className="logo" />
-        </a>
-      </footer>
 
       <style jsx>{`
         .container {
