@@ -97,7 +97,8 @@ export default function Home({tasks}) {
       <main>
         {!session && <>
           Not signed in <br/>
-          <button onClick={() => signin('github')}>Sign in with github</button>
+          {/* <button onClick={() => signin('github')}>Sign in with github</button> */}
+          <button onClick={() => signin('google')}>Sign in with Google</button>
         </>}
         {session && <>
           { error && <Alert severity="error" style={{margin: '20px'}}>{error}</Alert> }
@@ -148,7 +149,7 @@ export default function Home({tasks}) {
             })}
 
           </ul>
-          Signed in as {session.user.name} <br/>
+          Signed in as {session.user.email} <br/>
           <button onClick={signout}>Sign out</button>
         </>}
         {/* <Task test={tasks} onClick={() => {addTask({completed: false, taskName: 'hoge'})}} /> */}
