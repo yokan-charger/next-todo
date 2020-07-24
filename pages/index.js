@@ -96,9 +96,7 @@ export default function Home({tasks}) {
 
       <main>
         {!session && <>
-          Not signed in <br/>
-          {/* <button onClick={() => signin('github')}>Sign in with github</button> */}
-          <button onClick={() => signin('google')}>Sign in with Google</button>
+          <a href='/sign_in'> sign up </a>
         </>}
         {session && <>
           { error && <Alert severity="error" style={{margin: '20px'}}>{error}</Alert> }

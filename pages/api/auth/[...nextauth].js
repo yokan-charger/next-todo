@@ -1,9 +1,8 @@
 import NextAuth from 'next-auth'
 import Providers from 'next-auth/providers'
-
+const baseUrl = process.env.SITE || 'http://localhost:3000'
 const options = {
-  site: process.env.SITE || 'http://localhost:3000',
-
+  site: baseUrl,
   // Configure one or more authentication providers
   providers: [
     Providers.GitHub({
@@ -18,10 +17,8 @@ const options = {
   pages: {
     signin: '/auth/signin',
     signout: '/auth/signout',
-  }
-
-  // A database is optional, but required to persist accounts in a database
-//   database: process.env.DATABASE_URL,
+  },
 }
+
 
 export default (req, res) => NextAuth(req, res, options)
