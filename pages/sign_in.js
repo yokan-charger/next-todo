@@ -3,12 +3,14 @@ import { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Button, TextField, Checkbox, IconButton, CircularProgress} from '@material-ui/core';
 import { useSession, signin, signout } from 'next-auth/client'
+import { addUser } from '../lib/users'
 
 export default function SignIn({}) {
   const [tmpNameError, setNameTodoError] = useState(false)
   const [session, loading] = useSession()
 
-  const redirectRootPath = () => {
+  const redirectRootPath = async () => {
+    let user = await addUser(session['user']['email'])
     window.location = '/'
   }
 
@@ -29,7 +31,7 @@ export default function SignIn({}) {
           { loading }
         </>}
         { !loading && session && <>
-          { redirectRootPath() }
+          { redirectRootPath() && '' }
         </>}
       </main>
 
