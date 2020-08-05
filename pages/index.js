@@ -2,7 +2,7 @@ import Head from 'next/head'
 import Task from '../components/task'
 import {getAllTasks, addTask, deleteTask, putStatus, putTitle} from '../lib/tasks'
 import { useState } from 'react';
-import { Button, TextField, Checkbox, IconButton } from '@material-ui/core';
+import { Button, TextField, Checkbox, IconButton, CircularProgress } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { useSession, signin, signout } from 'next-auth/client'
@@ -95,10 +95,13 @@ export default function Home({tasks}) {
       </Head>
 
       <main>
-        {!session && <>
+        {loading && <>
+          <CircularProgress />
+        </>}
+        {!loading && !session && <>
           <a href='/sign_in'> sign up </a>
         </>}
-        {session && <>
+        {!loading && session && <>
           { error && <Alert severity="error" style={{margin: '20px'}}>{error}</Alert> }
           <div>
             <TextField
