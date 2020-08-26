@@ -10,6 +10,7 @@ export default function SignIn({}) {
   const [session, loading] = useSession()
 
   const redirectRootPath = async () => {
+    document.cookie = `email=${session['user']['email']}`
     let user = await addUser(session['user']['email'])
     window.location = '/'
   }

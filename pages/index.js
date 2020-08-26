@@ -6,13 +6,14 @@ import { Button, TextField, Checkbox, IconButton, CircularProgress } from '@mate
 import { Alert } from '@material-ui/lab';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { useSession, signin, signout } from 'next-auth/client'
+import { parseCookies } from 'nookies'
 
 export default function Home({tasks}) {
   const [todos, setTodos] = useState(tasks)
   const [tmpTodo, setTmpTodo] = useState("")
   const [tmpTodoError, setTmpTodoError] = useState(false)
   const [error, setError] = useState(tasks === null)
-  const [ session, loading ] = useSession()
+  const [session, loading ] = useSession()
 
   const addTodo = async () => {
     if (!tmpTodo) {
@@ -20,12 +21,12 @@ export default function Home({tasks}) {
       return
     }
 
-    let task = await addTask(tmpTodo)
+    let task = await addTask(tmpTodo, session.user.email)
 
-   if(!task) {
-     setError('エラーが発生しました、時間をおいて再度お試しください')
-     return
-   }
+    if(!task) {
+      setError('エラーが発生しました、時間をおいて再度お試しください')
+      return
+    }
 
     setTmpTodoError(false)
 
@@ -305,11 +306,13 @@ export default function Home({tasks}) {
   )
 }
 
-export async function getServerSideProps() {
-  const tasks = getAllTasks()
+export async function getServerSideProps(ctx) {
+  const email = parseCookies(ctx)['email']
+  const tasks = await getAllTasks(email)
   return {
     props: {
-      tasks
+      tasks,
+      email
     }
   }
 }
