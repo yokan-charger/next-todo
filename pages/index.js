@@ -6,7 +6,8 @@ import { Button, TextField, Checkbox, IconButton, CircularProgress } from '@mate
 import { Alert } from '@material-ui/lab';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { useSession, signin, signout } from 'next-auth/client'
-import { parseCookies } from 'nookies'
+// import { parseCookies } from 'nookies'
+const cookie = require('cookie');
 
 export default function Home({tasks}) {
   const [todos, setTodos] = useState(tasks)
@@ -14,6 +15,11 @@ export default function Home({tasks}) {
   const [tmpTodoError, setTmpTodoError] = useState(false)
   const [error, setError] = useState(tasks === null)
   const [session, loading ] = useSession()
+
+  const unsetCookie = () => {
+    document.cookie = "email="
+    return true
+  }
 
   const addTodo = async () => {
     if (!tmpTodo) {
@@ -152,7 +158,7 @@ export default function Home({tasks}) {
 
           </ul>
           Signed in as {session.user.email} <br/>
-          <button onClick={signout}>Sign out</button>
+          <button onClick={unsetCookie() && signout}>Sign out</button>
         </>}
         {/* <Task test={tasks} onClick={() => {addTask({completed: false, taskName: 'hoge'})}} /> */}
       </main>
@@ -306,8 +312,17 @@ export default function Home({tasks}) {
   )
 }
 
-export async function getServerSideProps(ctx) {
-  const email = parseCookies(ctx)['email']
+export async function getServerSideProps({req, res, query}) {
+  let cookies, email;
+  if (req.headers.cookie) {
+    cookies = cookie.parse(req.headers.cookie)
+    email = cookies['email'];
+  }
+  if (!email) {
+    res.setHeader("Location", '/sign_in');
+    res.statusCode = 302;
+    res.end;
+  }
   const tasks = await getAllTasks(email)
   return {
     props: {
