@@ -14,7 +14,7 @@
     "axios": "^0.19.2",
     "cookie": "^0.4.1",
     "next": "9.4.4",
-    "next-auth": "^2.2.0",
+    "next-auth": "^3.29.8",
     "nookies": "^2.4.0",
     "react": "16.13.1",
     "react-dom": "16.13.1"
